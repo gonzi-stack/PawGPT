@@ -1,0 +1,129 @@
+# Configuración del Modelo GPT
+model:
+  # Arquitectura del modelo
+  vocab_size: 32000              # Tamaño del vocabulario
+  d_model: 512                   # Dimensión del modelo (embeddings)
+  n_layers: 12                   # Número de capas transformer
+  n_heads: 8                     # Número de cabezas de atención
+  d_ff: 2048                     # Dimensión de la red feed-forward
+  max_seq_length: 1024           # Longitud máxima de secuencia
+  dropout: 0.1                   # Tasa de dropout
+  
+  # Configuración de atención
+  attention_dropout: 0.1         # Dropout en atención
+  activation_function: "gelu"    # Función de activación (gelu, relu, swish)
+  
+  # Inicialización
+  initializer_range: 0.02        # Rango para inicialización de pesos
+  layer_norm_eps: 1e-5          # Epsilon para layer normalization
+  
+  # Configuración de embeddings
+  position_embedding_type: "absolute"  # Tipo de embedding posicional
+  use_cache: true                # Usar caché para generación
+  
+  # Configuración específica para español
+  language: "es"                 # Idioma objetivo
+  case_sensitive: false          # Sensible a mayúsculas/minúsculas
+
+# Configuración del tokenizador
+tokenizer:
+  type: "bpe"                    # Tipo de tokenizador (bpe, sentencepiece)
+  vocab_size: 32000              # Tamaño del vocabulario
+  min_frequency: 2               # Frecuencia mínima para incluir token
+  
+  # Tokens especiales
+  special_tokens:
+    pad_token: "<PAD>"
+    unk_token: "<UNK>"
+    bos_token: "<BOS>"
+    eos_token: "<EOS>"
+    sys_token: "<SYS>"
+    user_token: "<USER>"
+    assistant_token: "<ASSISTANT>"
+    
+  # Configuración BPE
+  bpe_merges: 30000              # Número de merges para BPE
+  character_coverage: 0.9995     # Cobertura de caracteres
+  
+  # Preprocesamiento
+  lowercase: false               # Convertir a minúsculas
+  strip_accents: false           # Eliminar acentos
+  normalize_unicode: true        # Normalizar Unicode
+
+# Configuración de generación
+generation:
+  # Configuración por defecto
+  max_length: 256                # Longitud máxima de generación
+  min_length: 1                  # Longitud mínima de generación
+  
+  # Sampling
+  do_sample: true                # Usar sampling
+  temperature: 0.8               # Temperatura para sampling
+  top_k: 50                      # Top-k sampling
+  top_p: 0.9                     # Top-p (nucleus) sampling
+  
+  # Beam search
+  num_beams: 1                   # Número de beams (1 = no beam search)
+  early_stopping: true           # Parar early en beam search
+  
+  # Penalizaciones
+  repetition_penalty: 1.1        # Penalización por repetición
+  length_penalty: 1.0            # Penalización por longitud
+  no_repeat_ngram_size: 3        # Tamaño de n-gramas sin repetir
+  
+  # Tokens de parada
+  stop_tokens: ["<EOS>", "\n\n"] # Tokens que detienen la generación
+
+# Configuración del sistema de chat
+chat:
+  max_history: 10                # Máximo de intercambios en historial
+  max_context_length: 800        # Longitud máxima del contexto
+  
+  # System prompt por defecto
+  default_system_prompt: "Eres un asistente útil que responde en español de manera clara y precisa."
+  
+  # Formato de conversación
+  conversation_format:
+    system: "<SYS>{system_prompt}<EOS>"
+    user: "<USER>{user_message}<EOS>"
+    assistant: "<ASSISTANT>{assistant_message}<EOS>"
+    
+  # Configuración de generación específica para chat
+  chat_generation:
+    temperature: 0.7
+    top_k: 40
+    top_p: 0.9
+    max_length: 150
+    repetition_penalty: 1.1
+
+# Configuración de hardware
+hardware:
+  device: "auto"                 # Dispositivo (auto, cpu, cuda, mps)
+  mixed_precision: true          # Usar precisión mixta
+  gradient_checkpointing: false  # Usar gradient checkpointing
+  
+  # Configuración de memoria
+  max_memory_mb: 8192           # Memoria máxima en MB
+  cache_size: 1000              # Tamaño del caché de generación
+
+# Configuración de logging
+logging:
+  level: "INFO"                  # Nivel de logging (DEBUG, INFO, WARNING, ERROR)
+  log_file: "logs/model.log"     # Archivo de log
+  
+  # Métricas a registrar
+  metrics:
+    - "loss"
+    - "perplexity"
+    - "tokens_per_second"
+    - "memory_usage"
+
+# Configuración de checkpoints
+checkpointing:
+  save_format: "pytorch"         # Formato de guardado (pytorch, safetensors)
+  save_optimizer_states: true    # Guardar estados del optimizador
+  save_scheduler_states: true    # Guardar estados del scheduler
+  
+  # Configuración de archivos
+  checkpoint_dir: "checkpoints"
+  max_checkpoints: 5            # Máximo número de checkpoints a mantener

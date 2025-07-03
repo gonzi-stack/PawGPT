@@ -1,0 +1,278 @@
+# Configuración de Entrenamiento
+training:
+  # Configuración básica
+  max_epochs: 10                 # Número máximo de épocas
+  batch_size: 16                 # Tamaño del batch
+  gradient_accumulation_steps: 4  # Pasos de acumulación de gradientes
+  max_steps: -1                  # Máximo número de pasos (-1 = usar epochs)
+  
+  # Learning rate y optimización
+  learning_rate: 1e-4            # Tasa de aprendizaje inicial
+  weight_decay: 0.01             # Decay de pesos
+  adam_beta1: 0.9                # Beta1 para Adam
+  adam_beta2: 0.999              # Beta2 para Adam
+  adam_epsilon: 1e-8             # Epsilon para Adam
+  
+  # Gradient clipping
+  max_grad_norm: 1.0             # Norma máxima de gradientes
+  
+  # Configuración de warmup
+  warmup_steps: 1000             # Pasos de warmup
+  warmup_ratio: 0.1              # Ratio de warmup (alternativa a warmup_steps)
+  
+  # Evaluación y guardado
+  save_steps: 1000               # Guardar cada N pasos
+  eval_steps: 500                # Evaluar cada N pasos
+  logging_steps: 100             # Log cada N pasos
+  
+  # Early stopping
+  early_stopping_patience: 5     # Paciencia para early stopping
+  early_stopping_threshold: 0.001  # Umbral de mejora mínima
+  
+  # Configuración de datos
+  dataloader_num_workers: 4      # Número de workers para DataLoader
+  dataloader_pin_memory: true    # Pin memory para DataLoader
+  remove_unused_columns: false   # Remover columnas no utilizadas
+  
+  # Configuración de seed
+  seed: 42                       # Semilla para reproducibilidad
+  
+  # Configuración de checkpoint
+  resume_from_checkpoint: null   # Path al checkpoint para resumir
+  ignore_data_skip: false        # Ignorar skip de datos al resumir
+
+# Configuración del optimizador
+optimizer:
+  type: "adamw"                  # Tipo de optimizador (adamw, adam, sgd)
+  
+  # Configuración específica para AdamW
+  adamw:
+    lr: 1e-4
+    betas: [0.9, 0.999]
+    eps: 1e-8
+    weight_decay: 0.01
+    amsgrad: false
+    
+  # Configuración específica para SGD
+  sgd:
+    lr: 1e-3
+    momentum: 0.9
+    dampening: 0.0
+    weight_decay: 0.01
+    nesterov: false
+
+# Configuración del scheduler
+scheduler:
+  type: "cosine"                 # Tipo de scheduler (cosine, linear, constant)
+  
+  # Configuración específica para cosine
+  cosine:
+    warmup_steps: 1000
+    max_steps: 10000
+    eta_min: 1e-6
+    
+  # Configuración específica para linear
+  linear:
+    warmup_steps: 1000
+    max_steps: 10000
+    
+  # Configuración específica para constant
+  constant:
+    warmup_steps: 1000
+
+# Configuración de datos
+data:
+  # Paths de datos
+  train_data_path: "data/processed/train.jsonl"
+  validation_data_path: "data/processed/val.jsonl"
+  test_data_path: "data/processed/test.jsonl"
+  
+  # Configuración de preprocessing
+  max_length: 1024               # Longitud máxima de secuencia
+  truncation: true               # Truncar secuencias largas
+  padding: "max_length"          # Tipo de padding
+  
+  # Configuración de dataset
+  streaming: false               # Usar streaming para datasets grandes
+  buffer_size: 1000             # Tamaño del buffer para streaming
+  
+  # Validación de datos
+  validate_data: true            # Validar formato de datos
+  skip_invalid_data: true        # Saltar datos inválidos
+  
+  # Configuración de split
+  train_split_ratio: 0.8         # Ratio para split de entrenamiento
+  val_split_ratio: 0.1          # Ratio para split de validación
+  test_split_ratio: 0.1         # Ratio para split de prueba
+
+# Configuración de loss
+loss:
+  type: "cross_entropy"          # Tipo de loss (cross_entropy, focal_loss)
+  label_smoothing: 0.1           # Suavizado de etiquetas
+  ignore_index: -100             # Índice a ignorar en loss
+  
+  # Configuración específica para focal loss
+  focal_loss:
+    alpha: 1.0
+    gamma: 2.0
+
+# Configuración de métricas
+metrics:
+  # Métricas principales
+  primary_metric: "loss"         # Métrica principal para guardado
+  
+  # Métricas a calcular
+  compute_metrics:
+    - "perplexity"
+    - "bleu"
+    - "rouge"
+    - "accuracy"
+    
+  # Configuración de métricas específicas
+  bleu:
+    n_grams: 4
+    smooth: true
+    
+  rouge:
+    rouge_types: ["rouge1", "rouge2", "rougeL"]
+    use_stemmer: true
+
+# Configuración de logging y monitoreo
+logging:
+  # Configuración básica
+  log_level: "INFO"
+  log_file: "logs/training.log"
+  
+  # TensorBoard
+  tensorboard:
+    log_dir: "logs/tensorboard"
+    histogram_freq: 100
+    
+  # Weights & Biases
+  wandb:
+    project: "gpt-desde-cero"
+    entity: null
+    tags: ["gpt", "español", "transformer"]
+    notes: "Entrenamiento modelo GPT desde cero"
+    
+  # Configuración de reportes
+  report_to: ["tensorboard"]     # Opciones: tensorboard, wandb, all, none
+  
+  # Métricas a registrar
+  log_metrics:
+    - "train_loss"
+    - "eval_loss"
+    - "learning_rate"
+    - "epoch"
+    - "step"
+    - "tokens_per_second"
+    - "samples_per_second"
+    - "gpu_memory_usage"
+
+# Configuración de hardware y rendimiento
+performance:
+  # Configuración de GPU
+  fp16: false                    # Usar half precision
+  bf16: true                     # Usar bfloat16 (si está disponible)
+  tf32: true                     # Usar TF32 en Ampere
+  
+  # Configuración de memoria
+  gradient_checkpointing: true   # Usar gradient checkpointing
+  dataloader_num_workers: 4      # Workers para DataLoader
+  dataloader_pin_memory: true    # Pin memory
+  
+  # Configuración de compilación
+  torch_compile: false           # Compilar modelo con PyTorch 2.0
+  compile_mode: "default"        # Modo de compilación
+  
+  # Configuración de distributed training
+  ddp_find_unused_parameters: false
+  ddp_bucket_cap_mb: 25
+  ddp_broadcast_buffers: false
+
+# Configuración de distributed training
+distributed:
+  # Configuración básica
+  world_size: 1                  # Número total de procesos
+  rank: 0                        # Rank del proceso actual
+  local_rank: 0                  # Rank local del proceso
+  
+  # Configuración de comunicación
+  backend: "nccl"                # Backend para comunicación (nccl, gloo)
+  init_method: "env://"          # Método de inicialización
+  
+  # Configuración de timeout
+  timeout_minutes: 30            # Timeout en minutos
+  
+  # Configuración de sharding
+  use_fsdp: false                # Usar Fully Sharded Data Parallel
+  fsdp_config:
+    sharding_strategy: "full_shard"
+    cpu_offload: false
+    mixed_precision: true
+
+# Configuración de debugging
+debug:
+  # Flags de debugging
+  debug_mode: false              # Modo debug
+  profile: false                 # Habilitar profiling
+  detect_anomaly: false          # Detectar anomalías en autograd
+  
+  # Configuración de profiling
+  profiler:
+    activities: ["cpu", "cuda"]
+    record_shapes: true
+    profile_memory: true
+    with_stack: true
+    
+  # Configuración de límites para debugging
+  max_train_samples: null        # Límite de samples de entrenamiento
+  max_eval_samples: null         # Límite de samples de evaluación
+  max_steps_debug: 100           # Máximo pasos en modo debug
+
+# Configuración de callbacks
+callbacks:
+  # Callback de early stopping
+  early_stopping:
+    enabled: true
+    patience: 5
+    threshold: 0.001
+    mode: "min"
+    restore_best_weights: true
+    
+  # Callback de checkpoint
+  model_checkpoint:
+    enabled: true
+    save_best_only: true
+    save_weights_only: false
+    mode: "min"
+    
+  # Callback de learning rate
+  lr_scheduler:
+    enabled: true
+    monitor: "eval_loss"
+    factor: 0.5
+    patience: 3
+    min_lr: 1e-7
+    
+  # Callback personalizado
+  custom_callbacks: []
+
+# Configuración de experimentación
+experiment:
+  # Información del experimento
+  name: "gpt_baseline"
+  description: "Modelo GPT base entrenado desde cero"
+  tags: ["baseline", "spanish", "gpt"]
+  
+  # Configuración de reproducibilidad
+  deterministic: true            # Hacer entrenamiento determinístico
+  benchmark: false               # Usar benchmark de cuDNN
+  
+  # Configuración de output
+  output_dir: "checkpoints"
+  overwrite_output_dir: false
+  
+  # Configuración de evaluación final
+  final_eval: true               # Evaluar al final del entrenamiento
+  final_eval_dataset: "test"     # Dataset para evaluación final
