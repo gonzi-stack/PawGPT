@@ -15,8 +15,8 @@ Un modelo GPT completo implementado desde cero en PyTorch, optimizado para espa√
 
 ```bash
 # Clonar el repositorio
-[git clone https://github.com/tu-usuario/gpt-desde-cero.git](https://github.com/gonzi-stack/PawGPT.git)
-cd gpt-desde-cero
+git clone https://github.com/gonzi-stack/PawGPT.git
+cd PawGPT
 
 # Crear entorno virtual
 python -m venv venv
