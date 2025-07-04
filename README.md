@@ -1,4 +1,4 @@
-# 🤖 GPT desde Cero - Modelo de Lenguaje en Español
+# 🤖 PawGPT - Modelo de Lenguaje en Español
 
 Un modelo GPT completo implementado desde cero en PyTorch, optimizado para español con capacidades de chat y system prompts personalizables.
 
